@@ -66,6 +66,8 @@ async function updatePerson(req, res, next) {
   try {
     const updatedPerson = await Person.findByIdAndUpdate(id, person, {
       new: true,
+      runValidators: true,
+      context: "query",
     });
 
     if (updatedPerson) {
