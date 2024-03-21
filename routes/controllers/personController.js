@@ -1,4 +1,5 @@
 import Person from "../../models/Person.js";
+import isString from "../../utils/isString.js";
 
 async function getPersons(req, res) {
   const persons = await Person.find({});
@@ -32,6 +33,10 @@ async function getPerson(req, res, next) {
 async function createPerson(req, res, next) {
   try {
     const { name, number } = req.body;
+
+    if (name === undefined || number === undefined)
+      return res.status(400).json({ error: "content is missing" });
+
     const personExists = await Person.findOne({ name });
 
     if (personExists)
@@ -39,6 +44,10 @@ async function createPerson(req, res, next) {
 
     if (name === "" || number === "")
       return res.status(400).json({ error: "Name and number are required" });
+
+    if (!isString(name) || !isString(number)) {
+      return res.status(400).json({ error: "Name and number must be strings" });
+    }
 
     const person = new Person({
       name,
@@ -57,6 +66,15 @@ async function updatePerson(req, res, next) {
   const id = req.params.id;
 
   const { name, number } = req.body;
+
+  if (name === undefined || number === undefined)
+    return res.status(400).json({ error: "content is missing" });
+
+  if (name === "" || number === "")
+    return res.status(400).json({ error: "Name and number are required" });
+
+  if (!isString(name) || !isString(number))
+    return res.status(400).json({ error: "Name and number must be strings" });
 
   const person = {
     name,
