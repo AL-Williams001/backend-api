@@ -1,5 +1,5 @@
-import Person from "../../models/Person.js";
-import isString from "../../utils/isString.js";
+import Person from "../models/Person.js";
+import isString from "../utils/isString.js";
 
 async function getPersons(req, res) {
   const persons = await Person.find({});

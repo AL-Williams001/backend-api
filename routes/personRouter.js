@@ -1,5 +1,5 @@
 import express from "express";
-import personController from "./controllers/personController.js";
+import personController from "../controllers/personController.js";
 
 const personRouter = express.Router();
 
