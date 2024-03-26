@@ -7,6 +7,8 @@ export default function errorHandler(error, _req, res, next) {
     return res.status(400).send({ error: error.message });
   } else if (error.name === "JsonWebTokenError") {
     return res.status(401).json({ error: "invalid token" });
+  } else if (error.name === "TokenExpiredError") {
+    return res.status(401).json({ error: "token expired" });
   }
 
   next(error);
