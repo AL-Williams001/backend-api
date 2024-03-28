@@ -4,14 +4,18 @@ import isString from "../utils/isString.js";
 import getTokenFrom from "../utils/getTokenFrom.js";
 import jwt from "jsonwebtoken";
 import config from "../utils/config.js";
+import { ref, uploadBytes } from "firebase/storage";
+import storage from "../utils/firebaseConfig.js";
+import generateUniqueImageFileName from "../utils/generateUniqueImageFileName.js";
 
 async function getPersons(req, res) {
-  const persons = await Person.find({});
+  const decodedToken = jwt.verify(getTokenFrom(req), config.SECRET);
+  const persons = await Person.find({ user: decodedToken.id });
 
   return res.status(200).json(persons);
 }
 
-async function getPerson(req, res, next) {
+async function getPerson(req, res) {
   // Person.findById(req.params.id)
   //   .then((person) => {
   //     if (person) return res.status(200).json(person);
@@ -45,28 +49,27 @@ async function createPerson(req, res, next) {
 
     const user = await User.findById(decodedToken.id);
 
-    if (name === undefined || number === undefined)
-      return res.status(400).json({ error: "content is missing" });
+    const storageRef = ref(storage, generateUniqueImageFileName(req.file));
+    const metadata = {
+      contentType: "image/jpeg",
+    };
 
-    const personExists = await Person.findOne({ name });
+    const snapshot = await uploadBytes(storageRef, req.file.buffer, metadata);
 
-    if (personExists)
-      return res.status(400).json({ error: "Person already exists" });
-
-    if (name === "" || number === "")
-      return res.status(400).json({ error: "Name and number are required" });
-
-    if (!isString(name) || !isString(number)) {
-      return res.status(400).json({ error: "Name and number must be strings" });
-    }
+    const photoURL = `https://firbasestorage.googleapis.com/v0/b/${snapshot.ref.bucket}/o/${snapshot.ref.fullPath}?alt=media`;
 
     const person = new Person({
       name,
       number,
       user: user._id,
+      photoInfo: {
+        url: photoURL,
+        filename: snapshot.ref.fullPath,
+      },
     });
 
     const savedPerson = await person.save();
+
     user.persons = user.persons.concat(savedPerson._id);
     await user.save();
 

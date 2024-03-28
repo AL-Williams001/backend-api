@@ -7,6 +7,19 @@ async function getUsers(_req, res) {
   return res.status(200).json(users);
 }
 
+async function getUser(req, res, next) {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id).populate("persons");
+
+    if (user) res.status(200).json(user);
+
+    return res.status(404).json({ error: "User not found" });
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function createUser(req, res) {
   const { username, name, password } = req.body;
 
@@ -27,4 +40,5 @@ async function createUser(req, res) {
 export default {
   createUser,
   getUsers,
+  getUser,
 };
