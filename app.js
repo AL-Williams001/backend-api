@@ -10,14 +10,10 @@ import unknownEndpoint from "./middlewares/unknownEndpoint.js";
 
 const app = express();
 
-const connectToDB = async (url) => {
-  try {
-    await mongoose.connect(url);
-    console.log("Connected to MongoDB");
-  } catch (error) {
-    console.log(`Error connecting to DB: ${error}`);
-  }
-};
+async function connectToDB(url) {
+  await mongoose.connect(url);
+  console.log("Connected to DB");
+}
 
 connectToDB(config.MONGODB_URI);
 
