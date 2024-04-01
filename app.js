@@ -9,6 +9,7 @@ import errorHandler from "./middlewares/errorHandler.js";
 import unknownEndpoint from "./middlewares/unknownEndpoint.js";
 
 const app = express();
+
 const connectToDB = async (url) => {
   try {
     await mongoose.connect(url);

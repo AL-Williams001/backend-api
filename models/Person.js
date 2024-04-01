@@ -12,10 +12,6 @@ const personSchema = new mongoose.Schema({
     required: true,
   },
   user: String,
-  photoInfo: {
-    url: String,
-    filename: String,
-  },
 });
 
 personSchema.set("toJSON", {
